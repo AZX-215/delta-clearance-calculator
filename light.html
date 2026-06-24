@@ -157,8 +157,8 @@
           <summary>Calculation notes</summary>
           <div style="padding: 0 14px 14px;" class="note">
             <p><strong>Clearance calculation used:</strong> <span class="formula">30 + sag − (span × 0.12)</span>, where sag is interpolated from the selected conductor/ruling-span table.</p>
-            <p>NOTE: if calculated clearance is below <strong>5 ft 0 in</strong>, use <strong>5 ft 0 in</strong> as the minimum delta clearance. This page shows both the raw calculated value and the “use this” value.</p>
-            <p>If the actual span is outside the selected sag table range, the page extrapolates from the nearest two table points and flags it. Treat extrapolated results as a check item.</p>
+            <p>If calculated clearance is below <strong>5 ft 0 in</strong>, the <strong>5 ft 0 in</strong> minimum is applied. The suggested distance is then rounded up to the next whole inch.</p>
+            <p>If the actual span is outside the selected sag table range, the calculator extrapolates from the nearest two table points and flags it. Treat extrapolated results as a check item.</p>
           </div>
         </details>
       </section>
@@ -228,10 +228,11 @@ function calc(conductor, span, table, rulingSpanInput) {
   const i = interp(points, span);
   const calculated = 30 + i.sag - (span * 0.12);
   const useValue = Math.max(calculated, 60);
+  const suggestedValue = Math.ceil(useValue - 1e-9);
   const tableIsExact = tables.includes(Number(usedTable));
   const rulingWasRounded = table === 'auto' && isFinite(requestedRuling) && requestedRuling > 0 && Math.abs(requestedRuling - usedTable) > 0.01;
   const rulingOutsideAvailable = table === 'auto' && isFinite(requestedRuling) && requestedRuling > 0 && (requestedRuling < tables[0] || requestedRuling > tables[tables.length - 1]);
-  return { conductor, span, requestedRuling, availableTables: tables, usedTable, points, sag: i.sag, mode: i.mode, a: i.a, b: i.b, calculated, useValue, minApplied: calculated < 60, tableIsExact, rulingWasRounded, rulingOutsideAvailable };
+  return { conductor, span, requestedRuling, availableTables: tables, usedTable, points, sag: i.sag, mode: i.mode, a: i.a, b: i.b, calculated, useValue, suggestedValue, minApplied: calculated < 60, tableIsExact, rulingWasRounded, rulingOutsideAvailable };
 }
 function buildOptions(selected) {
   return conductorKeys.map(k => `<option value="${escapeHtml(k)}" ${k === selected ? 'selected' : ''}>${escapeHtml(cleanLabel(k))}</option>`).join('');
@@ -316,7 +317,7 @@ function updateCalc(id) {
     notes.push(`Requested ruling span ${fmtNum(r.requestedRuling)} ft is outside the available ruling-span tables for this conductor (${r.availableTables[0]}–${r.availableTables[r.availableTables.length - 1]} ft). Auto selected the nearest available ${r.usedTable}' RS table; verify manually.`);
   } else if (r.rulingWasRounded) {
     noteClass = 'warning';
-    notes.push(`Requested ruling span ${fmtNum(r.requestedRuling)} ft was rounded to the nearest available ${r.usedTable}' RS table, matching the workbook instruction to round to the nearest ruling span.`);
+    notes.push(`Requested ruling span ${fmtNum(r.requestedRuling)} ft was rounded to the nearest available ${r.usedTable}' RS table. Verify that this is the table you want to use.`);
   }
   if (r.mode.startsWith('extrapolated')) {
     noteClass = 'bad';
@@ -326,19 +327,19 @@ function updateCalc(id) {
   }
   if (r.minApplied) {
     if (noteClass === 'note') noteClass = 'warning';
-    notes.push(`Calculated clearance is below 5 ft 0 in, so the workbook note minimum is being applied.`);
+    notes.push(`Calculated clearance is below 5 ft 0 in, so the 5 ft 0 in minimum is being applied.`);
   }
   const noteText = notes.join('<br><br>');
   root.querySelector('[data-role="result"]').innerHTML = `
-    <div class="big"><div class="label">Use this comm-primary distance</div><div class="value">${fmtInches(r.useValue)}</div><div class="small">${fmtNum(r.useValue)} in${r.minApplied ? ' • 5 ft minimum applied' : ''}</div></div>
+    <div class="big"><div class="label">Suggested rounded-up comm-primary distance</div><div class="value">${fmtInches(r.suggestedValue)}</div><div class="small">${fmtNum(r.suggestedValue)} in • rounded up from ${fmtInches(r.useValue)}${r.minApplied ? ' • 5 ft minimum applied' : ''}</div></div>
     <div class="stats">
       <div class="stat"><div class="k">Calculated raw</div><div class="v">${fmtInches(r.calculated)}<br><span class="small">${fmtNum(r.calculated)} in</span></div></div>
+      <div class="stat"><div class="k">Minimum-applied value</div><div class="v">${fmtInches(r.useValue)}<br><span class="small">${fmtNum(r.useValue)} in</span></div></div>
       <div class="stat"><div class="k">Sag used</div><div class="v">${fmtNum(r.sag)} in</div></div>
-      <div class="stat"><div class="k">Table used</div><div class="v">${r.usedTable}' RS</div></div>
-      <div class="stat"><div class="k">Actual-span rows</div><div class="v">${rangeMin}–${rangeMax} ft</div></div>
+      <div class="stat"><div class="k">Table / rows used</div><div class="v">${r.usedTable}' RS<br><span class="small">${rangeMin}–${rangeMax} ft</span></div></div>
     </div>
     <div class="${noteClass}">${noteText}</div>
-    <div class="note"><strong>Source tab:</strong> ${escapeHtml(cleanLabel(conductor))}<br><span class="small">${escapeHtml(sourceTitle)}</span></div>`;
+    <div class="note"><strong>Conductor table:</strong> ${escapeHtml(cleanLabel(conductor))}<br><span class="small">${escapeHtml(sourceTitle)}</span></div>`;
   if (id === 'calcA') renderCurrentTable(r);
   saveState();
 }
@@ -353,7 +354,7 @@ function copyCalc(id) {
   const rulingRaw = Number(root.querySelector('[data-role="ruling"]').value);
   const tableVal = root.querySelector('[data-role="table"]').value;
   const r = calc(root.querySelector('[data-role="conductor"]').value, span, tableVal, isFinite(rulingRaw) && rulingRaw > 0 ? rulingRaw : span);
-  const text = `${conductor} | span ${fmtNum(span)} ft | ${r.usedTable}' RS table | required ${fmtInches(r.useValue)} (${fmtNum(r.useValue)} in)`;
+  const text = `${conductor} | span ${fmtNum(span)} ft | ${r.usedTable}' RS table | suggested rounded-up distance ${fmtInches(r.suggestedValue)} (${fmtNum(r.suggestedValue)} in) | minimum-applied value ${fmtInches(r.useValue)} (${fmtNum(r.useValue)} in)`;
   navigator.clipboard?.writeText(text).catch(() => {});
 }
 function updateRulingSpan() {

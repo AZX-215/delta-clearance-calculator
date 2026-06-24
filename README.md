@@ -2,52 +2,33 @@
 
 Offline/online delta clearance calculator with blue, grey, and light themes, built for quick ruling-span and actual-span clearance checks.
 
-## Included files
+## Open the calculator online
 
-- `index.html` — main landing page with links to each theme
-- `blue.html` — dark blue theme
-- `grey.html` — neutral dark gray theme
-- `light.html` — light gray theme
-- `.nojekyll` — keeps GitHub Pages from processing the files with Jekyll
-- `README.md` — this guide
-
-## How to use it online with GitHub Pages
-
-1. Upload all files to the root of your GitHub repository.
-2. In the repository, go to **Settings → Pages**.
-3. Under **Build and deployment**, choose **Deploy from a branch**.
-4. Select the `main` branch and the `/root` folder.
-5. Click **Save**.
-6. Open the GitHub Pages link once GitHub finishes publishing the site.
-
-The main online page will be:
-
-```text
-https://YOUR-USERNAME.github.io/YOUR-REPO-NAME/
-```
-
-The direct theme links will be:
-
-```text
-https://YOUR-USERNAME.github.io/YOUR-REPO-NAME/blue.html
-https://YOUR-USERNAME.github.io/YOUR-REPO-NAME/grey.html
-https://YOUR-USERNAME.github.io/YOUR-REPO-NAME/light.html
-```
-
-For this repository, the link should look like:
+After this repository is published with GitHub Pages, open the main site link:
 
 ```text
 https://AZX-215.github.io/delta-clearance-calculator/
 ```
 
-## How to use it offline
+The main page lets you choose one of three versions:
 
-1. Download or clone the repository to your computer.
-2. Open the folder in File Explorer.
-3. Double-click `index.html` to open the theme chooser in your browser.
-4. Select Blue, Grey, or Light.
+- Blue theme: `blue.html`
+- Grey theme: `grey.html`
+- Light theme: `light.html`
 
-You can also open a theme directly by double-clicking:
+Direct links:
+
+```text
+https://AZX-215.github.io/delta-clearance-calculator/blue.html
+https://AZX-215.github.io/delta-clearance-calculator/grey.html
+https://AZX-215.github.io/delta-clearance-calculator/light.html
+```
+
+## Open the calculator offline
+
+Download or clone the repository to your computer, then open `index.html` in your browser.
+
+You can also open any theme directly:
 
 - `blue.html`
 - `grey.html`
@@ -55,27 +36,29 @@ You can also open a theme directly by double-clicking:
 
 No internet connection is required once the files are on your computer. The calculator is built into the HTML files and does not depend on outside websites, scripts, or services.
 
-## Using it from Google Drive or OneDrive
+## Google Drive / OneDrive use
 
-You can store the files in a synced folder like Google Drive for Desktop or OneDrive and open them from File Explorer. That still runs the calculator locally on your computer.
+You can keep the repository folder in Google Drive for Desktop, OneDrive, Dropbox, or another synced folder. Open the files from File Explorer so they run locally in your browser.
 
 Opening the files from the Google Drive website may show a preview or download prompt instead of running the calculator as a normal webpage. For a real online webpage, use GitHub Pages.
 
-## Calculator features
+## Features
 
 Each theme has the same calculator functions:
 
 - 1, 2, or 3 calculators visible at once
 - Ruling span helper
-- Conductor/table selection
+- Conductor / table selection
 - Actual span input
-- Ruling span input
-- Automatic nearest ruling-span table selection
-- Final clearance result with raw calculation shown
-- Warnings when the selected table does not directly cover the entered values
+- Ruling span table selection
+- Calculated raw clearance
+- Minimum-applied value when the result is below 5 ft 0 in
+- Suggested rounded-up comm-primary distance, rounded up to the next whole inch
+- Warning messages when a value is outside the selected table range
+- Local browser saving for recent inputs/settings
 
 ## Notes
 
-- Settings are saved locally in the browser using local storage.
-- Saved settings may be separate for the online version and the offline local file version.
-- Treat warnings or extrapolated values as check items and verify against the original standard or workbook before final design use.
+- The suggested distance is rounded up to the next whole inch after any 5 ft 0 in minimum is applied.
+- Treat warnings or extrapolated values as check items and verify before final design use.
+- The calculator runs entirely in the browser. No data is sent anywhere.
