@@ -1,5 +1,7 @@
 # Delta Clearance Calculator
 
+[![GitHub Stats](https://github-stats-extended.vercel.app/api/top-langs?username=AZX-215&langs_count=5&theme=onedark)](https://github-stats-extended.vercel.app/api/top-langs?username=AZX-215&langs_count=5&theme=onedark)
+
 Offline/online delta clearance calculator with blue, grey, and light themes, built for quick ruling-span and actual-span clearance checks.
 
 ## Open the calculator online
